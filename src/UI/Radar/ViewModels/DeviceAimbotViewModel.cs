@@ -272,6 +272,25 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             set { App.Config.Device.TargetRaider = value; OnPropertyChanged(); }
         }
 
+        // FOV Circle Display
+        public bool ShowFovCircle
+        {
+            get => App.Config.Device.ShowFovCircle;
+            set { App.Config.Device.ShowFovCircle = value; OnPropertyChanged(); }
+        }
+
+        public string FovCircleColorEngaged
+        {
+            get => App.Config.Device.FovCircleColorEngaged;
+            set { App.Config.Device.FovCircleColorEngaged = value; OnPropertyChanged(); }
+        }
+
+        public string FovCircleColorIdle
+        {
+            get => App.Config.Device.FovCircleColorIdle;
+            set { App.Config.Device.FovCircleColorIdle = value; OnPropertyChanged(); }
+        }
+
         private bool _isTesting;
         public bool IsTesting
         {
@@ -540,13 +559,26 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
 
         private static void SendTestMove(int dx, int dy)
         {
-            if (App.Config.Device.UseKmBoxNet && DeviceNetController.Connected)
+            try
             {
-                DeviceNetController.Move(dx, dy);
-                return;
-            }
+                if (App.Config.Device.UseKmBoxNet && DeviceNetController.Connected)
+                {
+                    DeviceNetController.Move(dx, dy);
+                    return;
+                }
 
-            Device.move(dx, dy);
+                Device.move(dx, dy);
+            }
+            catch (TimeoutException tex)
+            {
+                DebugLogger.LogDebug($"[DeviceAimbotTest] Move timeout: {tex.Message}");
+                // swallow here so the test UI doesn't show a scary popup if the device already moved
+            }
+            catch (Exception ex)
+            {
+                DebugLogger.LogDebug($"[DeviceAimbotTest] Move error: {ex}");
+                throw;
+            }
         }
     }
 }
