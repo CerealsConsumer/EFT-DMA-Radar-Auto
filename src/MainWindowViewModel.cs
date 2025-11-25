@@ -40,7 +40,7 @@ namespace LoneEftDmaRadar
         public MainWindowViewModel(MainWindow parent)
         {
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            LoadHotkeyManager();
+            EnsureHotkeysRegistered();
         }
 
         public void ToggleFullscreen(bool toFullscreen)
@@ -71,6 +71,16 @@ namespace LoneEftDmaRadar
         /// Loads Hotkey Manager resources.
         /// Only call from Primary Thread/Window (ONCE!)
         /// </summary>
+        private bool _hotkeysRegistered;
+
+        internal void EnsureHotkeysRegistered()
+        {
+            if (_hotkeysRegistered)
+                return;
+            LoadHotkeyManager();
+            _hotkeysRegistered = true;
+        }
+
         private void LoadHotkeyManager()
         {
             var zoomIn = new HotkeyActionController("Zoom In");
@@ -93,6 +103,8 @@ namespace LoneEftDmaRadar
             toggleShowMeds.HotkeyStateChanged += ToggleShowMeds_HotkeyStateChanged;
             var engageAimbotDeviceAimbot = new HotkeyActionController("Engage Aimbot");
             engageAimbotDeviceAimbot.HotkeyStateChanged += EngageAimbotDeviceAimbot_HotkeyStateChanged;
+            var toggleDeviceAimbotEnabled = new HotkeyActionController("Toggle Device Aimbot");
+            toggleDeviceAimbotEnabled.HotkeyStateChanged += ToggleDeviceAimbotEnabled_HotkeyStateChanged;
             
             var toggleESP = new HotkeyActionController("Toggle ESP Overlay");
             toggleESP.HotkeyStateChanged += ToggleESP_HotkeyStateChanged;
@@ -120,6 +132,13 @@ namespace LoneEftDmaRadar
             HotkeyAction.RegisterController(toggleESPLoot);
             HotkeyAction.RegisterController(toggleESPExfils);
             HotkeyAction.RegisterController(engageAimbotDeviceAimbot);
+            HotkeyAction.RegisterController(toggleDeviceAimbotEnabled);
+            HotkeyManagerViewModel.NotifyControllersRegistered();
+        }
+
+        internal static void EnsureHotkeysRegisteredStatic()
+        {
+            MainWindow.Instance?.ViewModel?.EnsureHotkeysRegistered();
         }
 
         private void ToggleAimviewWidget_HotkeyStateChanged(object sender, HotkeyEventArgs e)
@@ -141,6 +160,17 @@ namespace LoneEftDmaRadar
             if (_parent.DeviceAimbot?.ViewModel is DeviceAimbotViewModel DeviceAimbotAim)
             {
                 DeviceAimbotAim.IsEngaged = e.State;
+            }
+        }
+
+        private void ToggleDeviceAimbotEnabled_HotkeyStateChanged(object sender, HotkeyEventArgs e)
+        {
+            if (!e.State)
+                return;
+
+            if (_parent.DeviceAimbot?.ViewModel is DeviceAimbotViewModel vm)
+            {
+                vm.Enabled = !vm.Enabled;
             }
         }
 

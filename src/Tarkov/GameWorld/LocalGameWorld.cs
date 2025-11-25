@@ -164,6 +164,10 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
                 {
                     throw;
                 }
+                catch (Exception ex) when (ex.InnerException?.Message?.Contains("GameWorld not found") == true)
+                {
+                    // Expected when not in raid - silently continue polling
+                }
                 catch (Exception ex)
                 {
                     DebugLogger.LogDebug($"ERROR Instantiating Game Instance: {ex}");
@@ -383,6 +387,9 @@ namespace LoneEftDmaRadar.Tarkov.GameWorld
         {
             try
             {
+                if (_rgtPlayers.Any(p => p is BtrPlayer))
+                    return;
+
                 var btrController = Memory.ReadPtr(this + Offsets.GameWorld.BtrController);
                 var btrView = Memory.ReadPtr(btrController + Offsets.BtrController.BtrView);
                 var btrTurretView = Memory.ReadPtr(btrView + Offsets.BTRView.turret);

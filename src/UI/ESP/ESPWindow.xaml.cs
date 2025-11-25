@@ -286,6 +286,11 @@ namespace LoneEftDmaRadar.UI.ESP
                             DrawLoot(ctx, screenWidth, screenHeight, localPlayer);
                         }
 
+                        if (App.Config.Loot.Enabled && App.Config.UI.EspContainers)
+                        {
+                            DrawStaticContainers(ctx, screenWidth, screenHeight, localPlayer);
+                        }
+
                         // Render Exfils
                         if (Exits is not null && App.Config.UI.EspExfils)
                         {
@@ -483,35 +488,95 @@ namespace LoneEftDmaRadar.UI.ESP
             }
         }
 
+        private void DrawStaticContainers(Dx9RenderContext ctx, float screenWidth, float screenHeight, LocalPlayer localPlayer)
+        {
+            if (!App.Config.Containers.Enabled)
+                return;
+
+            var containers = Memory.Game?.Loot?.StaticContainers;
+            if (containers is null)
+                return;
+
+            bool selectAll = App.Config.Containers.SelectAll;
+            var selected = App.Config.Containers.Selected;
+            float maxDistance = App.Config.Containers.EspDrawDistance;
+            var color = GetContainerColorForRender();
+
+            foreach (var container in containers)
+            {
+                var id = container.ID ?? "UNKNOWN";
+                if (!selectAll && !selected.ContainsKey(id))
+                    continue;
+
+                float distance = Vector3.Distance(localPlayer.Position, container.Position);
+                if (maxDistance > 0 && distance > maxDistance)
+                    continue;
+
+                if (!WorldToScreen2(container.Position, out var screen, screenWidth, screenHeight))
+                    continue;
+
+                ctx.DrawCircle(ToRaw(screen), 3f, color, true);
+                ctx.DrawText(container.Name ?? "Container", screen.X + 4, screen.Y + 4, color, DxTextSize.Small);
+            }
+        }
+
         private void DrawTripwires(Dx9RenderContext ctx, float screenWidth, float screenHeight)
         {
+            if (Explosives is null)
+                return;
+
             foreach (var explosive in Explosives)
             {
-                if (explosive is not Tripwire tripwire || !tripwire.IsActive)
+                if (explosive is null || explosive is not Tripwire tripwire || !tripwire.IsActive)
                     continue;
 
-                if (!WorldToScreen2(tripwire.Position, out var screen, screenWidth, screenHeight))
-                    continue;
+                try
+                {
+                    if (tripwire.Position == Vector3.Zero)
+                        continue;
 
-                var color = GetTripwireColorForRender();
-                ctx.DrawCircle(ToRaw(screen), 5f, color, true);
-                ctx.DrawText("Tripwire", screen.X + 6, screen.Y, color, DxTextSize.Small);
+                    if (!WorldToScreen2(tripwire.Position, out var screen, screenWidth, screenHeight))
+                        continue;
+
+                    var color = GetTripwireColorForRender();
+                    ctx.DrawCircle(ToRaw(screen), 5f, color, true);
+                    ctx.DrawText("Tripwire", screen.X + 6, screen.Y, color, DxTextSize.Small);
+                }
+                catch
+                {
+                    // Silently skip invalid tripwires to prevent ESP from breaking
+                    continue;
+                }
             }
         }
 
         private void DrawGrenades(Dx9RenderContext ctx, float screenWidth, float screenHeight)
         {
+            if (Explosives is null)
+                return;
+
             foreach (var explosive in Explosives)
             {
-                if (explosive is not Grenade grenade)
+                if (explosive is null || explosive is not Grenade grenade)
                     continue;
 
-                if (!WorldToScreen2(grenade.Position, out var screen, screenWidth, screenHeight))
-                    continue;
+                try
+                {
+                    if (grenade.Position == Vector3.Zero)
+                        continue;
 
-                var color = GetGrenadeColorForRender();
-                ctx.DrawCircle(ToRaw(screen), 5f, color, true);
-                ctx.DrawText("Grenade", screen.X + 6, screen.Y, color, DxTextSize.Small);
+                    if (!WorldToScreen2(grenade.Position, out var screen, screenWidth, screenHeight))
+                        continue;
+
+                    var color = GetGrenadeColorForRender();
+                    ctx.DrawCircle(ToRaw(screen), 5f, color, true);
+                    ctx.DrawText("Grenade", screen.X + 6, screen.Y, color, DxTextSize.Small);
+                }
+                catch
+                {
+                    // Silently skip invalid grenades to prevent ESP from breaking
+                    continue;
+                }
             }
         }
 
@@ -949,6 +1014,12 @@ namespace LoneEftDmaRadar.UI.ESP
                 return ToColor(ColorFromHex(aiHex));
             }
 
+            // Handle Player Scavs specifically.
+            if (player.Type == PlayerType.PScav)
+            {
+                return ToColor(ColorFromHex(cfg.EspColorPlayerScavs));
+            }
+
             // Fallback to user-configured player colours.
             return ToColor(ColorFromHex(cfg.EspColorPlayers));
         }
@@ -957,6 +1028,7 @@ namespace LoneEftDmaRadar.UI.ESP
         private DxColor GetExfilColorForRender() => ToColor(ColorFromHex(App.Config.UI.EspColorExfil));
         private DxColor GetTripwireColorForRender() => ToColor(ColorFromHex(App.Config.UI.EspColorTripwire));
         private DxColor GetGrenadeColorForRender() => ToColor(ColorFromHex(App.Config.UI.EspColorGrenade));
+        private DxColor GetContainerColorForRender() => ToColor(ColorFromHex(App.Config.UI.EspColorContainers));
         private DxColor GetCrosshairColor() => ToColor(ColorFromHex(App.Config.UI.EspColorCrosshair));
 
         private static SKColor ColorFromHex(string hex)

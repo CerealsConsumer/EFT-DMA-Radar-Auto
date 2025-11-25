@@ -528,6 +528,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             set { App.Config.UI.EspColorAI = value; OnPropertyChanged(); }
         }
 
+        public string EspColorPlayerScavs
+        {
+            get => App.Config.UI.EspColorPlayerScavs;
+            set { App.Config.UI.EspColorPlayerScavs = value; OnPropertyChanged(); }
+        }
+
         public string EspColorRaiders
         {
             get => App.Config.UI.EspColorRaiders;
@@ -544,6 +550,12 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
         {
             get => App.Config.UI.EspColorLoot;
             set { App.Config.UI.EspColorLoot = value; OnPropertyChanged(); }
+        }
+
+        public string EspColorContainers
+        {
+            get => App.Config.UI.EspColorContainers;
+            set { App.Config.UI.EspColorContainers = value; OnPropertyChanged(); }
         }
 
         public string EspColorExfil
@@ -663,6 +675,19 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
             }
         }
 
+        public float EspContainerDistance
+        {
+            get => App.Config.Containers.EspDrawDistance;
+            set
+            {
+                if (Math.Abs(App.Config.Containers.EspDrawDistance - value) > float.Epsilon)
+                {
+                    App.Config.Containers.EspDrawDistance = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string EspFontFamily
         {
             get => App.Config.UI.EspFontFamily;
@@ -728,6 +753,7 @@ namespace LoneEftDmaRadar.UI.Radar.ViewModels
                 if (App.Config.UI.EspTargetScreen != value)
                 {
                     App.Config.UI.EspTargetScreen = value;
+                    ESPManager.ApplyResolutionOverride();
                     OnPropertyChanged();
                 }
             }
