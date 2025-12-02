@@ -8,12 +8,12 @@ namespace SDK
         public readonly partial struct GameWorld
 		{
 			public const uint BtrController = 0x20; // EFT.Vehicle.BtrController
-			public const uint LocationId = 0xB8; // string
-			public const uint LootList = 0x178; // System.Collections.Generic.List<IKillable>
-			public const uint RegisteredPlayers = 0x190; // System.Collections.Generic.List<IPlayer>
-			public const uint MainPlayer = 0x1E0; // EFT.Player
-			public const uint SynchronizableObjectLogicProcessor = 0x218; // EFT.SynchronizableObjects.SynchronizableObjectLogicProcessor
-			public const uint Grenades = 0x258; // DictionaryListHydra<int, Throwable>
+			public const uint LocationId = 0xC0; // string - UPDATED from 0xB8
+			public const uint LootList = 0x180; // System.Collections.Generic.List<IKillable> - UPDATED from 0x178
+			public const uint RegisteredPlayers = 0x198; // System.Collections.Generic.List<IPlayer> - UPDATED from 0x190
+			public const uint MainPlayer = 0x1E8; // EFT.Player - UPDATED from 0x1E0
+			public const uint SynchronizableObjectLogicProcessor = 0x220; // EFT.SynchronizableObjects.SynchronizableObjectLogicProcessor - UPDATED from 0x218
+			public const uint Grenades = 0x260; // DictionaryListHydra<int, Throwable> - UPDATED from 0x258
 		}
 
         public readonly partial struct SynchronizableObject
@@ -57,14 +57,14 @@ namespace SDK
         {
             public const uint MovementContext = 0x60; // EFT.MovementContext
             public const uint _playerBody = 0x190; // EFT.PlayerBody
-            public const uint Physical = 0x8F0; // -.\uE399 <Physical> Physical
-            public const uint Corpse = 0x678; // EFT.Interactive.Corpse
-            public const uint Location = 0x868; // string
-            public const uint Profile = 0x8e0; // EFT.Profile
-            public const uint _playerLookRaycastTransform = 0x9e8; // UnityEngine.Transform
-            public const uint ProceduralWeaponAnimation = 0x330; // EFT.Animations.ProceduralWeaponAnimation
-            public const uint _inventoryController = 0x950; // EFT.PlayerInventoryController update
-            public const uint _handsController = 0x958; // EFT.PlayerHands update
+            public const uint ProceduralWeaponAnimation = 0x338; // EFT.Animations.ProceduralWeaponAnimation - UPDATED from 0x330
+            public const uint Corpse = 0x678; // EFT.Interactive.Corpse - UPDATED from 0x670
+            public const uint Location = 0x868; // String - UPDATED from 0x860
+            public const uint Profile = 0x8E0; // EFT.Profile - UPDATED from 0x8D8
+            public const uint Physical = 0x8F8; // Physical - UPDATED from 0x8F0
+            public const uint _inventoryController = 0x958; // EFT.PlayerInventoryController - UPDATED from 0x950
+            public const uint _handsController = 0x960; // EFT.PlayerHands - UPDATED from 0x958
+            public const uint _playerLookRaycastTransform = 0x9E8; // UnityEngine.Transform - ADDED
         }
 
         public readonly partial struct ObservedPlayerView
@@ -115,8 +115,8 @@ namespace SDK
 
         public readonly partial struct MovementContext
         {
-            public const uint Player = 0x48; // EFT.Player
-            public const uint _rotation = 0xC8; // UnityEngine.Vector2
+            public const uint Player = 0x48; // EFT.Player - NOTE: Dump shows 0x10 but this might be different inheritance
+            public const uint _rotation = 0xC8; // UnityEngine.Vector2 - UPDATED from 0xC4
             public const uint PlantState = 0x78; // EFT.BaseMovementState <PlantState> PlantState
             public const uint CurrentState = 0x1F0; // EFT.BaseMovementState <CurrentState>k__BackingField
             public const uint _states = 0x480; // System.Collections.Generic.Dictionary<Byte, BaseMovementState> <_states> _states
@@ -146,7 +146,7 @@ namespace SDK
 
         public readonly partial struct InteractiveLootItem
         {
-            public const uint Item = 0xF0; // EFT.InventoryLogic.Item
+            public const uint _item = 0xF0; // EFT.InventoryLogic.Item - RENAMED from Item to match official
         }
 
         public readonly partial struct DizSkinningSkeleton
@@ -220,7 +220,7 @@ namespace SDK
             public const uint _template = 0x20; // EFT.InventoryLogic.ISightComponentTemplate
             public const uint ScopesSelectedModes = 0x30; // System.Int32[]
             public const uint SelectedScope = 0x38; // System.Int32
-            public const uint ScopeZoomValue = 0x3C; // System.Single
+            public const uint ScopeZoomValue = 0x3c; // System.Single - lowercase hex to match dump
         }
 
         public readonly partial struct SightInterface
